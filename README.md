@@ -10,7 +10,7 @@ The simulation part of the code generates SiPM primary, crosstalk and afterpulsi
   3. Charge,
   4. label ("P" for primary, "CT1" for CT of primary, "CT2" for crosstalk of crosstalk or "AP" for afterpulsing).
 
-Currently, the code can plot the finger spectrum (using charge values) of the data and simulation in the same plot.
+The code can plot the finger spectrum (using charge values) of the data and simulation in the same plot for direct comparison.
 
 # TODO
   1. Implement a Minimizer class that takes a RealData object and a Simulation object and performs minimization on simulation parameters to find the optimal parameters that fit the measured data.
