@@ -8,6 +8,11 @@
     #include "simulation.h"
 #endif
 
+#ifndef MINIMIZER_H
+    #define MINIMIZER_H
+    #include "minimizer.h"
+#endif
+
 #include "TCanvas.h"
 #include "TApplication.h"
 #include "TRandom.h"
@@ -83,23 +88,18 @@ int main(int argc, char *argv[])
     gRandom->SetSeed(0);
 	gStyle->SetOptFit(1111);
 
-    // Load real measurements here
+    // Load measurements here
+    RealData data("./data/measurement.bin");
 
     // initialize parameters with parameters.h file
     FixedParameters fparams;
     VariableParameters vparams;
 
     // Initializes simulation
-    Simulation sim(fparams, vparams);
-
-    // Runs simulation
-    sim.Simulate();
-
-    // Loads real data
-    RealData data("./data/measurement.bin");
+    Minimizer minimizer(fparams, vparams, data);
 
     // plots  finger spectrum for loaded data and simulation
-    PlotData(data, sim);
+    PlotData(minimizer.GetData(), minimizer.GetSim());
 
 
     myApp->Run();

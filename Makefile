@@ -1,31 +1,34 @@
-CFITSIO = $(FITSIOROOT)
-CPP = g++
-CC = gcc
-CFLAGS = -g -Wall -I$(CFITSIO) $(shell root-config --cflags) -O3
-LIBS = -L$(CFITSIO) -lcfitsio -lm $(shell root-config --glibs) -lTreeViewer
-GLIBS =
-GLIBS +=
-OBJECTS = main.o realdata.o simulation.o aux_functions.o
-HEADERS =
-DEBUG_FLAG = -g
+# Compiler
+CXX := g++
 
-ALL : main.exe
-	@echo File has been successfully compiled $(NEWLINE)
+# Compiler flags
+CXXFLAGS := -Wall -Wextra -std=c++17 $(shell root-config --cflags)
 
-main.exe : $(OBJECTS)
-	$(CPP) $(OBJECTS) $(DEBUG_FLAG) -o main.exe $(LIBS) $(GLIBS) $(CFLAGS)
+# Linker flags
+LDFLAGS := $(shell root-config --libs)
 
-main.o : main.cpp $(HEADERS)
-	$(CPP) -c main.cpp $(DEBUG_FLAG) -o main.o $(CFLAGS)
+# Target executable
+TARGET := main
 
-realdata.o : realdata.cpp $(HEADERS)
-	$(CPP) -c realdata.cpp $(DEBUG_FLAG) -o realdata.o $(CFLAGS)
+# Source files
+SRCS := main.cpp aux_functions.cpp realdata.cpp simulation.cpp minimizer.cpp
 
-simulation.o : simulation.cpp $(HEADERS)
-	$(CPP) -c simulation.cpp $(DEBUG_FLAG) -o simulation.o $(CFLAGS)
+# Object files
+OBJS := $(SRCS:.cpp=.o)
 
-aux_functions.o : aux_functions.cpp $(HEADERS)
-	$(CPP) -c aux_functions.cpp $(DEBUG_FLAG) -o aux_functions.o $(CFLAGS)
+# Default target
+all: $(TARGET)
 
+# Link object files to create the executable
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+# Compile source files into object files
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Clean up build files
 clean:
-	rm -f *~ *.o *.exe
+	rm -f $(OBJS) $(TARGET)
+
+.PHONY: all clean

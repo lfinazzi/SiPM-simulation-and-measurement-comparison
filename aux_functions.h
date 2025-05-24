@@ -13,6 +13,7 @@
 
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TF1.h"
 
 
 /*********************************************************
@@ -212,19 +213,6 @@ double Mean(std::vector<double> v);
 
 
 /****************************************************************************
- * Plot histogram from file data
- * Arguments:
- *      std::string : file name
- *      int : number of histogram bins
- *      double : minimum value for x-axis
- *      double : maximum value for x-axis
- * Returns:
- *      void
- ****************************************************************************/
-void PlotHistogram(std::string name, int numBins, double min, double max);
-
-
-/****************************************************************************
  * Calculates charge outputs in a time gate from Measurement input vector
  * Arguments:
  *      std::vector<Measurement> : input measurements
@@ -233,3 +221,24 @@ void PlotHistogram(std::string name, int numBins, double min, double max);
  *      std::vector<double>
  ****************************************************************************/
 std::vector<double> ChargeOutput(std::vector<Measurement> input, VariableParameters params);
+
+
+/****************************************************************************
+ * Copies a VariableParameters object into a vector of doubles
+ * Arguments:
+ *      VariableParameters : input parameters
+ *      std::vector<double> : output vector
+ * Returns:
+ *      None
+ ****************************************************************************/
+std::vector<double> ParameterToVector(VariableParameters &vparams, std::vector<double> &output);
+
+/****************************************************************************
+ * Copies paramters stored in a vector to VariableParameters object
+ * Arguments:
+ *      std::vector<double> : input measurements in vector form
+ *      VariableParameters : simulation parameters to update
+ * Returns:
+ *      None
+ ****************************************************************************/
+void UpdateParameters(std::vector<double> vparams_vector, VariableParameters &vparams);

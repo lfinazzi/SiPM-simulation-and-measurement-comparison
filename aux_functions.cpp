@@ -11,7 +11,6 @@
 #include "TCanvas.h"
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TF1.h"
 
 
 double Minimum(double value1, double value11, double value2, double value22)
@@ -216,40 +215,6 @@ std::vector<double> RemoveSaturatedCounts(Parameters params, std::vector<double>
 }
 */
 
-void PlotHistogram(std::string name, int numBins, double min, double max)
-{
-    std::fstream ifs;
-    double d;
-    std::vector<double> data;
-    ifs.open(name);
-    if(ifs.is_open())
-    {
-        while(ifs >> d)
-        {
-            data.push_back(d);
-        }
-    }
-    else
-        std::cout << "Couldn't open specified file.\n";
-
-    TCanvas* customCanvas = new TCanvas("Custom canvas", "Custom canvas", 800, 600);
-    TH1F* customHist = new TH1F("customHist", "customHist", numBins, min, max);
-
-    FillHist(customHist, data);
-    customHist->Draw("E1");
-    customHist->GetXaxis()->SetTitle("Time [s]");
-    customHist->GetYaxis()->SetTitle("Entries");
-
-    // Custom fit function for histogram - Currently to test hypothesis that timing arrival distribution is not uniform
-    TF1* fitFunc = new TF1("fitFunc", "[0]", min, max);
-    fitFunc->SetParameters(0);
-    //customHist->Fit(fitFunc, "R");
-
-    customCanvas->Update();
-    
-    return;
-}
-
 std::vector<double> ChargeOutput(std::vector<Measurement> input, VariableParameters vparams)
 {
     std::vector<double> charge;
@@ -285,4 +250,47 @@ std::vector<double> ChargeOutput(std::vector<Measurement> input, VariableParamet
 
     std::cout << "Done!\n";
     return output;
+}
+
+std::vector<double> ParameterToVector(VariableParameters &vparams, std::vector<double> &output)
+{
+    output[0] = vparams.DCR;
+    output[1] = vparams.pde;
+    output[2] = vparams.pAPSHORT;
+    output[3] = vparams.tAPSHORT;
+    output[4] = vparams.pAPLONG;
+    output[5] = vparams.tAPLONG;
+    output[6] = vparams.pCT;
+    output[7] = vparams.tCT;
+    output[8] = vparams.jitter;
+    output[9] = vparams.jitterLoc;
+    output[10] = vparams.pulseWidth;
+    output[11] = vparams.rechargeTime;
+    output[12] = vparams.gain;
+    output[13] = vparams.gainStd;
+    output[14] = vparams.gate;
+    output[15] = vparams.AFEAmpGainFactor;
+    return output;
+}
+
+void UpdateParameters(std::vector<double> &vparams_vector, VariableParameters &vparams)
+{
+    vparams.DCR = vparams_vector[0];
+    vparams.pde = vparams_vector[1];
+    vparams.pAPSHORT = vparams_vector[2];
+    vparams.tAPSHORT = vparams_vector[3];
+    vparams.pAPLONG = vparams_vector[4];
+    vparams.tAPLONG = vparams_vector[5];
+    vparams.pCT = vparams_vector[6];
+    vparams.tCT = vparams_vector[7];
+    vparams.jitter = vparams_vector[8];
+    vparams.jitterLoc = vparams_vector[9];
+    vparams.pulseWidth = vparams_vector[10];
+    vparams.rechargeTime = vparams_vector[11];
+    vparams.gain = vparams_vector[12];
+    vparams.gainStd = vparams_vector[13];
+    vparams.gate = vparams_vector[14];
+    vparams.AFEAmpGainFactor = vparams_vector[15];
+
+    return;
 }
