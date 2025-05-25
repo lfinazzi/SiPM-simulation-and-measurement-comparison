@@ -53,26 +53,12 @@ void PlotData(Simulation sim)
     return;
 }
 
-void PlotData(RealData data, Simulation sim)
+void PlotData(Minimizer minimizer)
 {
-    TH1D* chargeHistogramData = new TH1D("charge histogram data", "charge histogram sim", 300, 0, 1E-11);
-    TH1D* chargeHistogramSim = new TH1D("charge histogram data", "charge histogram sim",300, 0, 1E-11);
+    TH1D* chargeHistogramData = minimizer.GetDataHist();
+    TH1D* chargeHistogramSim = minimizer.GetSimHist();
     
-    std::vector<double> chargesData = data.GetChargeData();
-    std::vector<double> chargesSim = sim.SimDataCharge(0);
-
-    for(size_t i = 0; i < chargesData.size(); i++) {
-        chargeHistogramData->Fill(chargesData[i]);
-    }
-
-
-    for(size_t i = 0; i < chargesSim.size(); i++) {
-        chargeHistogramSim->Fill(chargesSim[i]);
-    }
-
     TCanvas *c = new TCanvas("c", "Charge Histogram", 800, 600);
-    
-    chargeHistogramSim->SetLineColor(kRed);
     
     chargeHistogramData->Draw();
     chargeHistogramSim->Draw("SAME");
@@ -81,6 +67,7 @@ void PlotData(RealData data, Simulation sim)
 
     return;
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -99,11 +86,17 @@ int main(int argc, char *argv[])
     data.Adjust(fparams);
 
     // Initializes simulation
-    Minimizer minimizer(fparams, vparams, data);
+    int iterations = 10;
+    double stepSize = 1;
+    double delta = 0.001;
+    Minimizer minimizer(fparams, vparams, data, iterations, stepSize, delta);
 
     // plots  finger spectrum for loaded data and simulation
     //PlotData(minimizer.GetSim());
-    PlotData(minimizer.GetData(), minimizer.GetSim());
+    PlotData(minimizer);
+
+    minimizer.CalculateDerivative(12);
+    minimizer.CalculateDerivative(12);
 
 
     myApp->Run();

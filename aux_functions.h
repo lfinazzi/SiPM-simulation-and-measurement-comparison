@@ -227,11 +227,10 @@ std::vector<double> ChargeOutput(std::vector<Measurement> input, VariableParamet
  * Copies a VariableParameters object into a vector of doubles
  * Arguments:
  *      VariableParameters : input parameters
- *      std::vector<double> : output vector
  * Returns:
- *      None
+ *      std::vector<double> : output vector with parameters
  ****************************************************************************/
-std::vector<double> ParameterToVector(VariableParameters &vparams, std::vector<double> &output);
+std::vector<double> ParameterToVector(VariableParameters &vparams);
 
 /****************************************************************************
  * Copies paramters stored in a vector to VariableParameters object
@@ -241,4 +240,4 @@ std::vector<double> ParameterToVector(VariableParameters &vparams, std::vector<d
  * Returns:
  *      None
  ****************************************************************************/
-void UpdateParameters(std::vector<double> vparams_vector, VariableParameters &vparams);
+void UpdateParameters(std::vector<double> &vparams_vector, VariableParameters &vparams);

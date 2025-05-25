@@ -40,9 +40,9 @@ void RealData::LoadData(std::string pathToFile)
         ret = fread(&int16_temp, sizeof(uint16_t), 1, f0);
         // chage (short gate)
         ret = fread(&int16_temp, sizeof(uint16_t), 1, f0);
-        chargeValues.push_back((double)int16_temp);
         // charge (long gate)
         ret = fread(&int16_temp, sizeof(uint16_t), 1, f0);
+        chargeValues.push_back((double)int16_temp);
         // baseline
         ret = fread(&int16_temp, sizeof(uint16_t), 1, f0);
         // baseline std    

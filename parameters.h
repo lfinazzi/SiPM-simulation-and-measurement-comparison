@@ -24,7 +24,7 @@ struct FixedParameters{
     // 10E3 is the TIA gain of AFE
     // 1.8E-10 is the 1 p.e. charge measurement
     // 40E-15 is the charge measurement sensitivity
-    double AFEadjustment                                    = (4 * 22.5E-9) / 11 / 10E3 / 1.8E-10 * 40E-15; 
+    double AFEadjustment                                    = (3.5 * 22.5E-9) / 11 / 10E3 / 1.8E-10 * 40E-15; 
     
 };
 
@@ -46,13 +46,13 @@ struct VariableParameters{
     double tAPSHORT                                         = 10E-9;
 
     // Probability of long afterpulsing
-    double pAPLONG                                          = 0.07;
+    double pAPLONG                                          = 0.02;
 
     // Time constant of long afterpulsing [s]
     double tAPLONG                                          = 100E-9;
 
     // Probability of crosstalk event
-    double pCT                                              = 0.15;
+    double pCT                                              = 0.11;
 
     // Time constant of crosstalk event [s]
     double tCT                                              = 1E-9;
@@ -64,7 +64,7 @@ struct VariableParameters{
     double jitterLoc                                        = 0;
 
     // Pulse width of microcell detection [s]
-    double pulseWidth                                       = 11E-9;
+    double pulseWidth                                       = 50E-9;
 
     // Microcell recharge time [s]
     double rechargeTime                                     = 82E-9;
@@ -76,6 +76,6 @@ struct VariableParameters{
     double gainStd                                          = 3.5E5;
         
     // charge integration gate
-    double gate                                             = 75E-9;
+    double gate                                             = 70E-9;
 
 };

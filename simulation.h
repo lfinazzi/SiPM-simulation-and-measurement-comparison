@@ -80,6 +80,11 @@ public:
      ****************************************************************************/
     inline std::vector<double> SimDataCharge(int n) { return simData[n].charges; }
 
+    /****************************************************************************
+     * set VariableParameters member
+     ****************************************************************************/
+    inline void SetVParameters(VariableParameters _vparams) { vparams = _vparams; }
+
 private:
     FixedParameters fparams;
     VariableParameters vparams;

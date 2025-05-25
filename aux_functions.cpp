@@ -225,15 +225,16 @@ std::vector<double> ChargeOutput(std::vector<Measurement> input, VariableParamet
         trigger.push_back(input[i].time);
     }
 
-    // Now the charge needs to be integrated in a time bin
+    // The charge needs to be integrated in a time bin
 
     double q = 0;
     std::vector<double> output;
 
     uint pointer = 0;
-    for(uint i = 0; i < trigger.size() - 1; i++)
+    // TODO: fix potential out of bounds error - For now, restricted for loop to not include the last 10 elements
+    for(uint i = 0; i < trigger.size() - 10; i++)
     {
-        if(pointer >= trigger.size() - 1)
+        if(pointer >= trigger.size() - 10)
             break;
 
         q = charge[pointer];
@@ -247,28 +248,27 @@ std::vector<double> ChargeOutput(std::vector<Measurement> input, VariableParamet
         output.push_back(q);
     }
 
-
-    std::cout << "Done!\n";
     return output;
 }
 
-std::vector<double> ParameterToVector(VariableParameters &vparams, std::vector<double> &output)
+std::vector<double> ParameterToVector(VariableParameters &vparams)
 {
-    output[0] = vparams.DCR;
-    output[1] = vparams.pde;
-    output[2] = vparams.pAPSHORT;
-    output[3] = vparams.tAPSHORT;
-    output[4] = vparams.pAPLONG;
-    output[5] = vparams.tAPLONG;
-    output[6] = vparams.pCT;
-    output[7] = vparams.tCT;
-    output[8] = vparams.jitter;
-    output[9] = vparams.jitterLoc;
-    output[10] = vparams.pulseWidth;
-    output[11] = vparams.rechargeTime;
-    output[12] = vparams.gain;
-    output[13] = vparams.gainStd;
-    output[14] = vparams.gate;
+    std::vector<double> output;
+    output.push_back(vparams.DCR);
+    output.push_back(vparams.pde);
+    output.push_back(vparams.pAPSHORT);
+    output.push_back(vparams.tAPSHORT);
+    output.push_back(vparams.pAPLONG);
+    output.push_back(vparams.tAPLONG);
+    output.push_back(vparams.pCT);
+    output.push_back(vparams.tCT);
+    output.push_back(vparams.jitter);
+    output.push_back(vparams.jitterLoc);
+    output.push_back(vparams.pulseWidth);
+    output.push_back(vparams.rechargeTime);
+    output.push_back(vparams.gain);
+    output.push_back(vparams.gainStd);
+    output.push_back(vparams.gate);
     return output;
 }
 
