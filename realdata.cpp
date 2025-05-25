@@ -54,3 +54,11 @@ void RealData::LoadData(std::string pathToFile)
     std::cout << "data loading successful (ret code: " << ret << ")\n";
 	return;
 }
+
+void RealData::Adjust(FixedParameters fparams)
+{
+    for(size_t i = 0; i < chargeValues.size(); i++) {
+        chargeValues[i] *= fparams.AFEadjustment;
+    }
+    return;
+}

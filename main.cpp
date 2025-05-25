@@ -20,11 +20,11 @@
 
 void PlotData(RealData data)
 {
-    TH1D* chargeHistogram = new TH1D("charge histogram", "charge histogram", 100, 0, 1E-9);
+    TH1D* chargeHistogram = new TH1D("charge histogram", "charge histogram", 100, 0, 1E-11);
     std::vector<double> charges = data.GetChargeData();
 
     for(size_t i = 0; i < charges.size(); i++) {
-        chargeHistogram->Fill(charges[i] * 40E-15);     // acquired with 40 fC/LSB
+        chargeHistogram->Fill(charges[i]);
     }
 
     TCanvas *c = new TCanvas("c", "Charge Histogram", 800, 600);
@@ -37,7 +37,7 @@ void PlotData(RealData data)
 
 void PlotData(Simulation sim)
 {
-    TH1D* chargeHistogram = new TH1D("charge histogram", "charge histogram", 100, 0, 1E-9);
+    TH1D* chargeHistogram = new TH1D("charge histogram", "charge histogram", 100, 0, 1E-11);
 
     std::vector<double> charges = sim.SimDataCharge(0);
 
@@ -55,14 +55,14 @@ void PlotData(Simulation sim)
 
 void PlotData(RealData data, Simulation sim)
 {
-    TH1D* chargeHistogramData = new TH1D("charge histogram data", "charge histogram sim", 100, 0, 1E-9);
-    TH1D* chargeHistogramSim = new TH1D("charge histogram data", "charge histogram sim", 100, 0, 1E-9);
+    TH1D* chargeHistogramData = new TH1D("charge histogram data", "charge histogram sim", 300, 0, 1E-11);
+    TH1D* chargeHistogramSim = new TH1D("charge histogram data", "charge histogram sim",300, 0, 1E-11);
     
     std::vector<double> chargesData = data.GetChargeData();
     std::vector<double> chargesSim = sim.SimDataCharge(0);
 
     for(size_t i = 0; i < chargesData.size(); i++) {
-        chargeHistogramData->Fill(chargesData[i] * 40E-15);     // acquired with 40 fC/LSB
+        chargeHistogramData->Fill(chargesData[i]);
     }
 
 
@@ -74,8 +74,8 @@ void PlotData(RealData data, Simulation sim)
     
     chargeHistogramSim->SetLineColor(kRed);
     
-    chargeHistogramData->Draw("E");
-    chargeHistogramSim->Draw("E SAME");
+    chargeHistogramData->Draw();
+    chargeHistogramSim->Draw("SAME");
     c->SetLogy();
     c->Update();
 
@@ -95,10 +95,14 @@ int main(int argc, char *argv[])
     FixedParameters fparams;
     VariableParameters vparams;
 
+    // Adjust data to compensate for AFE gain at acquisition (this allows simulation comparison)
+    data.Adjust(fparams);
+
     // Initializes simulation
     Minimizer minimizer(fparams, vparams, data);
 
     // plots  finger spectrum for loaded data and simulation
+    //PlotData(minimizer.GetSim());
     PlotData(minimizer.GetData(), minimizer.GetSim());
 
 

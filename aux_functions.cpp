@@ -244,7 +244,7 @@ std::vector<double> ChargeOutput(std::vector<Measurement> input, VariableParamet
             j += 1;
         }
         pointer += j;
-        output.push_back(q * vparams.AFEAmpGainFactor);
+        output.push_back(q);
     }
 
 
@@ -269,7 +269,6 @@ std::vector<double> ParameterToVector(VariableParameters &vparams, std::vector<d
     output[12] = vparams.gain;
     output[13] = vparams.gainStd;
     output[14] = vparams.gate;
-    output[15] = vparams.AFEAmpGainFactor;
     return output;
 }
 
@@ -290,7 +289,6 @@ void UpdateParameters(std::vector<double> &vparams_vector, VariableParameters &v
     vparams.gain = vparams_vector[12];
     vparams.gainStd = vparams_vector[13];
     vparams.gate = vparams_vector[14];
-    vparams.AFEAmpGainFactor = vparams_vector[15];
 
     return;
 }

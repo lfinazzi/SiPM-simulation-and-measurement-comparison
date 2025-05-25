@@ -16,6 +16,16 @@ struct FixedParameters{
     // Time bin or time discretization [s]
     double timeBin                                          = 500E-12;
 
+    // Analog front end amplification gain [C]
+    // this is the amplification gain of measurements. AFE = TIA + Voltage amplifier
+    // Number between (...) was simulated with pyhton script -> TODO: Measure it
+    // (...) is the integral of voltage pulse
+    // 11 is the V/V gain of AFE
+    // 10E3 is the TIA gain of AFE
+    // 1.8E-10 is the 1 p.e. charge measurement
+    // 40E-15 is the charge measurement sensitivity
+    double AFEadjustment                                    = (4 * 22.5E-9) / 11 / 10E3 / 1.8E-10 * 40E-15; 
+    
 };
 
 struct VariableParameters{
@@ -60,16 +70,12 @@ struct VariableParameters{
     double rechargeTime                                     = 82E-9;
 
     // SiPM gain
-    double gain                                             = 6E6;
+    double gain                                             = 5E6;
 
     // Microcell standard deviation
     double gainStd                                          = 3.5E5;
         
     // charge integration gate
     double gate                                             = 75E-9;
-
-    // Analog front end amplification gain
-    // this is the amplification gain of measurements. AFE = TIA + Voltage amplifier
-    double AFEAmpGainFactor                                 = 200;
 
 };

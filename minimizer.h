@@ -32,6 +32,7 @@ public:
         sim.Simulate();
         vparams_vector.resize(16);
         ParameterToVector(vparams, vparams_vector);
+        
     }  
     
     // returns data member

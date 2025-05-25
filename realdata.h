@@ -6,6 +6,11 @@
 
 #define EVENT_NUMBER_IN_BYTES 16
 
+#ifndef PARAMETERS_H
+    #define PARAMETERS_H
+    #include "parameters.h"
+#endif
+
 class RealData{
 
 public:
@@ -31,6 +36,16 @@ public:
      *      std::vector<double> : charge values
      ****************************************************************************/
     inline std::vector<double> GetChargeData() { return chargeValues; }
+
+
+    /****************************************************************************
+     * Adjusts real measurements to compensate for AFE gain
+     * Arguments:
+     *      FixedParameters : fixed parameters, which contain AFE gain adjustment
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void Adjust(FixedParameters fparams);
 
 private:
     std::vector<double> chargeValues;
