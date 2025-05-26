@@ -1,5 +1,5 @@
 # SiPM-simulation-and-measurement-comparison
-The aim of this repository is to simulate SiPM data and to compare it with real measurements acquired with CAEN DT5751.
+The aim of this repository is to simulate SiPM data and to compare it with real measurements acquired with CAEN DT5751. In addition, a Minimizer was implemented to better tune simulation parameters. Fined tune simulation can then be used for SiPM data generation.
 
 Measurements were made with CAEN DT5751 and these measurements contain charge in a 75 ns gate (among other parameters, like timetag of event or pile up flags).
 
@@ -13,5 +13,10 @@ The simulation part of the code generates SiPM primary, crosstalk and afterpulsi
 The code can plot the finger spectrum (using charge values) of the data and simulation in the same plot for direct comparison.
 
 # TODO
-  1. Implement a Minimizer class that takes a RealData object and a Simulation object and performs minimization on simulation parameters to find the optimal parameters that fit the measured data.
-  2. Implement plotting of minimization steps to see how the simulation gets closer to the measured data as iteration of parameter values is performed. 
+  1. Implement finger spectrum histogram normalization to be independent on the number of events in RealData and Simulation objects. In addition, change histogram limits for better visualization,
+  2. Try a minimization scalar which contains log(data) and log(sim) instead of data and sim (for better comparison in log scale),
+  3. Try parameter normalization before minimization,
+  4. Beter tune learning rate and Minimizer parameters. Recheck ADAM optimizer implementation,
+  5. Do something about noisy gradients (running more simulations is not desired due to increased execution time),
+  6. Implement a temporal signal/waveform generation pipeline (can be constructed with a pulse template of desired SiPM).
+
