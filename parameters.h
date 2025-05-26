@@ -11,10 +11,13 @@ struct FixedParameters{
     double photonRate                                       = 0 * 1E3;
 
     // Integration time/measurement window [s]
-    double T                                                = 30;
+    double T                                                = 0.3;
 
     // Time bin or time discretization [s]
     double timeBin                                          = 500E-12;
+
+    // Timing jitter mean [s]
+    double jitterLoc                                        = 0;
 
     // Analog front end amplification gain [C]
     // this is the amplification gain of measurements. AFE = TIA + Voltage amplifier
@@ -60,11 +63,8 @@ struct VariableParameters{
     // Timing jitter standard deviation [s]
     double jitter                                           = 565E-12 / 2.355;
 
-    // Timing jitter mean [s]
-    double jitterLoc                                        = 0;
-
     // Pulse width of microcell detection [s]
-    double pulseWidth                                       = 50E-9;
+    double pulseWidth                                       = 50E-9;        // unused as of this version. Planned for future use
 
     // Microcell recharge time [s]
     double rechargeTime                                     = 82E-9;

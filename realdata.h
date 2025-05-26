@@ -15,17 +15,18 @@ class RealData{
 
 public:
     // constructor --> initialized with path of .bin file
-    RealData(std::string pathToFile);
+    RealData(std::string pathToFile, int eventsToLoad);
 
 
     /****************************************************************************
      * Loads SiPM data from binary files in ./data/ folder
      * Arguments:
      *      std::string : path to .bin file
+     *      int : number of events to load
      * Returns:
      *      None
      ****************************************************************************/
-    void LoadData(std::string path);
+    void LoadData(std::string path, int eventsToLoad);
 
 
     /****************************************************************************

@@ -3,12 +3,12 @@
     #include "realdata.h"
 #endif
 
-RealData::RealData(std::string pathToFile)
+RealData::RealData(std::string pathToFile, int eventsToLoad)
 {
-    LoadData(pathToFile);
+    LoadData(pathToFile, eventsToLoad);
 }
 
-void RealData::LoadData(std::string pathToFile)
+void RealData::LoadData(std::string pathToFile, int eventsToLoad)
 {
 	/* Opens binary files */
 	FILE *f0 = fopen(pathToFile.c_str(), "rb");
@@ -22,9 +22,12 @@ void RealData::LoadData(std::string pathToFile)
 	int fileSize0 = ftell(f0);	// get current file pointer
 	fseek(f0, 0, SEEK_SET);		// seek back to beginning of file
 
-    int events0 = fileSize0 / EVENT_NUMBER_IN_BYTES;
+    int totalEvents = fileSize0 / EVENT_NUMBER_IN_BYTES;
 
-	std::cout << "File opened (" << fileSize0 / 1E9 << " GB, " << events0 / 1E6 << "M events)" << std::endl;
+    // prevents out of bounds error
+    int events0 = (totalEvents > eventsToLoad) ? eventsToLoad : totalEvents;
+
+	std::cout << "File opened (" << fileSize0 / 1E9 << " GB, " << events0 / 1E6 << "M events will be loaded)" << std::endl;
 
     int iter0 = 1;
     uint16_t int16_temp;

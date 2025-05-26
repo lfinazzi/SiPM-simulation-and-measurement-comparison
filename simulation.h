@@ -3,8 +3,16 @@
     #include "parameters.h"
 #endif
 
+
 #include <string>
+#include <chrono>
 #include <vector>
+#include <iostream>
+#include <chrono>
+#include <fstream>
+
+#include "TRandom.h"
+#include "TMath.h"
 
 
 /*****************************************************************

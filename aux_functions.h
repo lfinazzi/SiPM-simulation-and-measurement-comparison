@@ -8,9 +8,15 @@
     #include "simulation.h"
 #endif
 
+
 #include <vector>
 #include <string>
+#include <iostream>
+#include <fstream>
 
+#include "TRandom.h"
+#include "TMath.h"
+#include "TCanvas.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TF1.h"
@@ -241,3 +247,25 @@ std::vector<double> ParameterToVector(VariableParameters &vparams);
  *      None
  ****************************************************************************/
 void UpdateParameters(std::vector<double> &vparams_vector, VariableParameters &vparams);
+
+
+/****************************************************************************
+ * prints vector components to console
+ * Arguments:
+ *      std::vector<double> : input vector
+ * Returns:
+ *      None
+ ****************************************************************************/
+void PrintVector(std::vector<double> &vparams_vector, std::string legend);
+
+/****************************************************************************
+ * Slightly randomizes parameters in VariableParameters object
+ * to test performance of Minimizer class
+ * Arguments:
+ *      VariableParameters : input parameters to randomize
+ *      double : scale factor for randomization (default = 0.1)
+ * Returns:
+ *      None
+ ****************************************************************************/
+void RandomizeParameters(VariableParameters &vparams, double scale = 0.1);
+

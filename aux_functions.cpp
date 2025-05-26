@@ -3,15 +3,6 @@
     #include "aux_functions.h"
 #endif
 
-#include <iostream>
-#include <fstream>
-
-#include "TRandom.h"
-#include "TMath.h"
-#include "TCanvas.h"
-#include "TH1F.h"
-#include "TH2F.h"
-
 
 double Minimum(double value1, double value11, double value2, double value22)
 {
@@ -263,7 +254,6 @@ std::vector<double> ParameterToVector(VariableParameters &vparams)
     output.push_back(vparams.pCT);
     output.push_back(vparams.tCT);
     output.push_back(vparams.jitter);
-    output.push_back(vparams.jitterLoc);
     output.push_back(vparams.pulseWidth);
     output.push_back(vparams.rechargeTime);
     output.push_back(vparams.gain);
@@ -283,12 +273,44 @@ void UpdateParameters(std::vector<double> &vparams_vector, VariableParameters &v
     vparams.pCT = vparams_vector[6];
     vparams.tCT = vparams_vector[7];
     vparams.jitter = vparams_vector[8];
-    vparams.jitterLoc = vparams_vector[9];
-    vparams.pulseWidth = vparams_vector[10];
-    vparams.rechargeTime = vparams_vector[11];
-    vparams.gain = vparams_vector[12];
-    vparams.gainStd = vparams_vector[13];
-    vparams.gate = vparams_vector[14];
+    vparams.pulseWidth = vparams_vector[9];
+    vparams.rechargeTime = vparams_vector[10];
+    vparams.gain = vparams_vector[11];
+    vparams.gainStd = vparams_vector[12];
+    vparams.gate = vparams_vector[13];
 
     return;
 }
+
+void PrintVector(std::vector<double> &vparams_vector, std::string legend)
+{
+    std::cout << legend;
+    for(uint i = 0; i < vparams_vector.size(); i++)
+    {
+        std::cout << vparams_vector[i] << ", ";
+    }
+    std::cout << std::endl;
+    return;
+}
+
+void RandomizeParameters(VariableParameters &vparams, double scale)
+{
+    vparams.DCR += gRandom->Gaus(0, vparams.DCR * scale);
+    vparams.pde += gRandom->Gaus(0, vparams.pde * scale);
+    vparams.pAPSHORT += gRandom->Gaus(0, vparams.pAPSHORT * scale);
+    vparams.tAPSHORT += gRandom->Gaus(0, vparams.tAPSHORT * scale);
+    vparams.pAPLONG += gRandom->Gaus(0, vparams.pAPLONG * scale);
+    vparams.tAPLONG += gRandom->Gaus(0, vparams.tAPLONG * scale);
+    vparams.pCT += gRandom->Gaus(0, vparams.pCT * scale);
+    vparams.tCT += gRandom->Gaus(0, vparams.tCT * scale);
+    vparams.jitter += gRandom->Gaus(0, vparams.jitter * scale);
+    vparams.pulseWidth += gRandom->Gaus(0, vparams.pulseWidth * scale);
+    vparams.rechargeTime += gRandom->Gaus(0, vparams.rechargeTime * scale);
+    vparams.gain += gRandom->Gaus(0, vparams.gain * scale);
+    vparams.gainStd += gRandom->Gaus(0, vparams.gainStd * scale);
+    vparams.gate += gRandom->Gaus(0, vparams.gate * scale);
+
+    return;
+}
+
+

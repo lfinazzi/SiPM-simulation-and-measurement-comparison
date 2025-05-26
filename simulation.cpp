@@ -8,20 +8,11 @@
     #include "aux_functions.h"
 #endif
 
-#include <chrono>
-#include <vector>
-#include <iostream>
-#include <chrono>
-#include <fstream>
-
-#include "TRandom.h"
-#include "TMath.h"
-
 
 void Simulation::Simulate()
 {
-    auto start = std::chrono::high_resolution_clock::now();
-    std::cout << "\nStarting simulation...\n";
+    //auto start = std::chrono::high_resolution_clock::now();
+    //std::cout << "\nStarting simulation...\n";
 
     double currentTime = 0;
     SimulationOutput simOut;
@@ -34,7 +25,7 @@ void Simulation::Simulate()
     {
         currentTime = triggers[l];
 
-        double detTime = currentTime + gRandom->Gaus(vparams.jitterLoc, vparams.jitter);
+        double detTime = currentTime + gRandom->Gaus(fparams.jitterLoc, vparams.jitter);
 
         double charge = gRandom->Gaus(vparams.gain, vparams.gainStd)*ELECTRONCHARGE;
         Measurement meas = CreateMeasurement(detTime, 1, charge, "P");
@@ -55,7 +46,7 @@ void Simulation::Simulate()
         for(uint i = 0; i < CTs.size(); i++){
 
             // Primary
-            double CTtime = currentTime + gRandom->Exp(vparams.tCT) + gRandom->Gaus(vparams.jitterLoc, vparams.jitter);
+            double CTtime = currentTime + gRandom->Exp(vparams.tCT) + gRandom->Gaus(fparams.jitterLoc, vparams.jitter);
             double charge = gRandom->Gaus(vparams.gain, vparams.gainStd)*ELECTRONCHARGE;
             Measurement meas = CreateMeasurement(CTtime, 1, charge, "CT1");
 
@@ -64,7 +55,7 @@ void Simulation::Simulate()
 
             // Secondary
             for(int k = 0; k < CTs[i][1]; k++){
-                double CTtime2 = currentTime + gRandom->Exp(vparams.tCT) + gRandom->Gaus(vparams.jitterLoc, vparams.jitter);
+                double CTtime2 = currentTime + gRandom->Exp(vparams.tCT) + gRandom->Gaus(fparams.jitterLoc, vparams.jitter);
                 double charge2 = gRandom->Gaus(vparams.gain, vparams.gainStd)*ELECTRONCHARGE;
                 Measurement meas = CreateMeasurement(CTtime2, 1, charge2, "CT2");
 
@@ -82,7 +73,7 @@ void Simulation::Simulate()
             {
                 double apTime = gRandom->Exp(vparams.tAPSHORT);
                 double charge = gRandom->Gaus(Gain(vparams, apTime), vparams.gainStd)*ELECTRONCHARGE;
-                Measurement meas = CreateMeasurement(currentTime + apTime + gRandom->Gaus(vparams.jitterLoc, vparams.jitter), 1, charge, "APSHORT");
+                Measurement meas = CreateMeasurement(currentTime + apTime + gRandom->Gaus(fparams.jitterLoc, vparams.jitter), 1, charge, "APSHORT");
                 simOut.measurements.push_back(meas);
             }
 
@@ -92,7 +83,7 @@ void Simulation::Simulate()
             {
                 double apTime = gRandom->Exp(vparams.tAPLONG);
                 double charge = gRandom->Gaus(Gain(vparams, apTime), vparams.gainStd)*ELECTRONCHARGE;
-                Measurement meas = CreateMeasurement(currentTime + apTime + gRandom->Gaus(vparams.jitterLoc, vparams.jitter), 1, charge, "APLONG");
+                Measurement meas = CreateMeasurement(currentTime + apTime + gRandom->Gaus(fparams.jitterLoc, vparams.jitter), 1, charge, "APLONG");
                 simOut.measurements.push_back(meas);
             }            
         }
@@ -107,8 +98,8 @@ void Simulation::Simulate()
     simData[simData.size()-1].charges = ChargeOutput(sorted.measurements, vparams);
 
     // Time after simulation execution
-    auto stop = std::chrono::high_resolution_clock::now();
-    std::cout << "Simulation completed in " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << " milliseconds.\n";
+    //auto stop = std::chrono::high_resolution_clock::now();
+    //std::cout << "Simulation completed in " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << " milliseconds.\n";
 
     return;
 }

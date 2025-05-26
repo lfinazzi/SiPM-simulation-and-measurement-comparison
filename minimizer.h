@@ -27,16 +27,26 @@ class Minimizer
 public: 
       
     // constructor . Loads all parameter and data and initializes simulation and histograms
-    Minimizer(FixedParameters _fparameters, VariableParameters _vparameters, RealData _data, int iterations, double stepSize, double delta);
+    Minimizer(FixedParameters _fparameters, VariableParameters _vparameters, RealData _data, int iterations, double stepPerc, double minmimUpdatePerc);
 
     /****************************************************************************
      * Calculates S = sum( (data_i - simulation_i )^2 ) using their histograms
      * Arguments:
-     *      bool : calculates S for aux simulation if true
+     *      None
      * Returns:
      *      None
      ****************************************************************************/
-    void CalculateS(bool aux = false);
+    void CalculateS();
+
+    /****************************************************************************
+     * Calculates S = sum( (data_i - simulation_i )^2 ) using an external histogram
+     * Arguments:
+     *      TH1D : external histogram
+     *      std::string : option to use: plus or minus
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void CalculateSExternal(TH1D hist, std::string option);
 
     /****************************************************************************
      * Calculates the derivative  of S with respect to a variable parameters
@@ -55,6 +65,24 @@ public:
      *      None
      ****************************************************************************/
     void CalculateGradient();
+
+    /****************************************************************************
+     * Updates the variable parameters and the simulation with the new parameters
+     * Arguments:
+     *      None
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void Update();
+
+    /****************************************************************************
+     * Runs minimizer for a number of iterations
+     * Arguments:
+     *      None
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void RunMinimizer();
     
     // returns data member
     inline RealData GetData() { return data; }
@@ -62,8 +90,17 @@ public:
     // returns current simulation member
     inline Simulation GetSim() { return sim; }
 
+    // returns data histogra
     inline TH1D* GetDataHist() { return &dataHist; }
+
+    // returns simulation histogram
     inline TH1D* GetSimHist() { return &simHist; }
+
+    // returns S value for each iteration
+    inline std::vector<double> GetSVector() { return svector; }
+
+    // returns S value change for each iteration
+    inline std::vector<double> GetSChangeVector() { return schangevector; }
 
 
 private:
@@ -74,19 +111,31 @@ private:
     FixedParameters fparams;
     VariableParameters vparams;
     std::vector<double> vparams_vector;
+    std::vector<double> svector;
+    std::vector<double> schangevector;
 
     // aux minimization variables
     double S;
     std::vector<double> gradient;
-    double aux_S;
+    double aux_S_plus;
+    double aux_S_minus;
     VariableParameters aux_vparams;
     std::vector<double> aux_vparams_vector;
     TH1D aux_simHist;
 
     // minimization parameters
     int iterations;
-    double stepSize;
+    double stepPerc;
     int currentStep;
-    double delta;
 
+    // --- Adam optimizer state ---
+    std::vector<double> m;  // First moment vector
+    std::vector<double> v;  // Second moment vector
+    int t = 0;              // Time step
+
+    // Adam hyperparameters
+    double beta1 = 0.7;         // standard is 0.9, but lower is better for noisier gradients
+    double beta2 = 0.999;
+    double epsilon = 1e-8;
+    double minimUpdatePerc;
 };
