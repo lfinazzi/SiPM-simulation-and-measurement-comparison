@@ -13,10 +13,7 @@ The simulation part of the code generates SiPM primary, crosstalk and afterpulsi
 The code can plot the finger spectrum (using charge values) of the data and simulation in the same plot for direct comparison.
 
 # TODO
-  1. Implement finger spectrum histogram normalization to be independent on the number of events in RealData and Simulation objects. In addition, change histogram limits for better visualization,
-  2. Try a minimization scalar which contains log(data) and log(sim) instead of data and sim (for better comparison in log scale),
-  3. Try parameter normalization before minimization,
-  4. Beter tune learning rate and Minimizer parameters. Recheck ADAM optimizer implementation,
-  5. Do something about noisy gradients (running more simulations is not desired due to increased execution time),
-  6. Implement a temporal signal/waveform generation pipeline (can be constructed with a pulse template of desired SiPM).
+  1. Try other minimization scalars (currently using Negative Log Likelihood, but it's erratic),
+  2. Refine minimization procedure and take care of noisy gradients,
+  3. Implement a temporal signal/waveform generation pipeline (can be constructed with a pulse template of desired SiPM).
 

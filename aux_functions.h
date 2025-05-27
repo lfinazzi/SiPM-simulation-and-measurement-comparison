@@ -223,10 +223,11 @@ double Mean(std::vector<double> v);
  * Arguments:
  *      std::vector<Measurement> : input measurements
  *      FixedParameters : simulation parameters
+ *      VariableParameters : simulation parameters
  * Returns:
  *      std::vector<double>
  ****************************************************************************/
-std::vector<double> ChargeOutput(std::vector<Measurement> input, VariableParameters params);
+std::vector<double> ChargeOutput(std::vector<Measurement> input, FixedParameters fparams, VariableParameters vparams);
 
 
 /****************************************************************************
@@ -258,6 +259,7 @@ void UpdateParameters(std::vector<double> &vparams_vector, VariableParameters &v
  ****************************************************************************/
 void PrintVector(std::vector<double> &vparams_vector, std::string legend);
 
+
 /****************************************************************************
  * Slightly randomizes parameters in VariableParameters object
  * to test performance of Minimizer class
@@ -269,3 +271,28 @@ void PrintVector(std::vector<double> &vparams_vector, std::string legend);
  ****************************************************************************/
 void RandomizeParameters(VariableParameters &vparams, double scale = 0.1);
 
+
+/****************************************************************************
+ * Normalized SiPM pulse signal
+ * Arguments:
+ *      double t : time to evaluate
+ *      double t0 : time of pulse start
+ *      double tau_rise : rise time
+ *      double tau_fall : fall time
+ * Returns:
+ *      double : pulse value at time t
+ ****************************************************************************/
+double SiPMPulseNormalized(double t, double t0, double tau_rise, double tau_fall);
+
+
+/****************************************************************************
+ * Integral of SiPM pulse signal to evaluate charge lost due to gate duration.
+ * Arguments:
+ *      double t : time to integrate after t0
+ *      double t0 : time of pulse start
+ *      double tau_rise : rise time
+ *      double tau_fall : fall time
+ * Returns:
+ *      double : integral value at time t
+ ****************************************************************************/
+double SiPMPulseIntegral(double t, double t0, double tau_rise, double tau_fall);

@@ -42,7 +42,10 @@ void PlotAll(Minimizer minimizerBefore, Minimizer minimizerAfter)
     TH1D* histDataAfter = minimizerAfter.GetDataHist();
     TH1D* histSimAfter = minimizerAfter.GetSimHist();
 
-    // S values during minimization
+    histSimBefore->Scale(1.0/histSimBefore->GetEntries());      // normalizes the simHist to compare with normalized dataHist
+    histSimAfter->Scale(1.0/histSimAfter->GetEntries());      // normalizes the simHist to compare with normalized dataHist
+
+    // NLL values during minimization
     std::vector<double> Svec = minimizerAfter.GetSVector();
     int nPoints = Svec.size();
     std::vector<double> x(nPoints), y(nPoints);
@@ -88,15 +91,15 @@ void PlotAll(Minimizer minimizerBefore, Minimizer minimizerAfter)
 
     // --- Pad 3: S vs iteration ---
     c->cd(3);
-    gS->SetTitle("S value during minimization;n;S_{n}");
+    gS->SetTitle("NLL value during minimization;n;NLL");
     gS->SetLineColor(kBlue);
     gS->SetLineWidth(2);
     gS->Draw("AL");
-    gPad->SetLogy();
+    //gPad->SetLogy();
 
     // --- Pad 4: change in S vs iteration ---
     c->cd(4);
-    gChangeS->SetTitle("Change in S value during minimization;n;S_{n} - S_{n-1}");
+    gChangeS->SetTitle("Change in NLL value during minimization;n;#Delta NLL");
     gChangeS->SetLineColor(kBlue);
     gChangeS->SetLineWidth(2);
     gChangeS->Draw("AL");
@@ -112,25 +115,25 @@ int main(int argc, char *argv[])
 	gStyle->SetOptFit(1111);
 
     // Load measurements here
-    int eventsToLoad = 20E3;
+    int eventsToLoad = 3E6;
     RealData data("./data/measurement.bin", eventsToLoad);
 
     // initialize parameters with parameters.h file
     FixedParameters fparams;
 
     VariableParameters vparams;
-    double randomScale = 0.15; // scale for randomization of parameters (to test Minimizer with slightly incorrect parameters)
+    double randomScale = 0.2; // scale for randomization of parameters (to test Minimizer with slightly incorrect parameters)
     RandomizeParameters(vparams, randomScale);
 
     // Adjust data to compensate for AFE gain at acquisition (this allows simulation comparison)
     data.Adjust(fparams);
 
     // Initializes simulation
-    int iterations = 350;
-    double stepPerc = 5E-3;
-    double minimUpdatePerc = 0.05;
+    int iterations = 50;
+    double derivStepPerc = 1E-3;
+    double startingLearningRate = 5E-3;
     
-    Minimizer minimizer(fparams, vparams, data, iterations, stepPerc, minimUpdatePerc);
+    Minimizer minimizer(fparams, vparams, data, iterations, derivStepPerc, startingLearningRate);
 
     // plot before minimization
     Minimizer min_before = minimizer;

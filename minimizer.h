@@ -27,26 +27,29 @@ class Minimizer
 public: 
       
     // constructor . Loads all parameter and data and initializes simulation and histograms
-    Minimizer(FixedParameters _fparameters, VariableParameters _vparameters, RealData _data, int iterations, double stepPerc, double minmimUpdatePerc);
+    Minimizer(FixedParameters _fparameters, VariableParameters _vparameters, RealData _data, int iterations, double derivStepPerc, double startingLearningRate);
 
     /****************************************************************************
-     * Calculates S = sum( (data_i - simulation_i )^2 ) using their histograms
+     * Calculates the negative log likelihood of measuring the sim data
+     * given the measurement data (which is treated as the real distribution).
      * Arguments:
      *      None
      * Returns:
      *      None
      ****************************************************************************/
-    void CalculateS();
+    void CalculateNLL();
 
     /****************************************************************************
-     * Calculates S = sum( (data_i - simulation_i )^2 ) using an external histogram
+     * Calculates the negative log likelihood of measuring the sim data
+     * given the measurement data (which is treated as the real distribution)
+     * using an external histogram.
      * Arguments:
      *      TH1D : external histogram
      *      std::string : option to use: plus or minus
      * Returns:
      *      None
      ****************************************************************************/
-    void CalculateSExternal(TH1D hist, std::string option);
+    void CalculateNLLExternal(TH1D hist, std::string option);
 
     /****************************************************************************
      * Calculates the derivative  of S with respect to a variable parameters
@@ -59,6 +62,7 @@ public:
 
     /****************************************************************************
      * Calculates the gradient of S with respect to the variable parameters
+     * uses gradientIters iterations to average the gradient
      * Arguments:
      *      None
      * Returns:
@@ -83,6 +87,25 @@ public:
      *      None
      ****************************************************************************/
     void RunMinimizer();
+
+    /****************************************************************************
+     * Normalizes parameters so all of them are in the range [0, 1] for 
+     * minimization purposes.
+     * Arguments:
+     *      None
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void NormalizeParameters();
+
+    /****************************************************************************
+     * Denormalizes parameters after minimzation to rerun simulations.
+     * Arguments:
+     *      None
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void DenormalizeParameters();
     
     // returns data member
     inline RealData GetData() { return data; }
@@ -115,18 +138,19 @@ private:
     std::vector<double> schangevector;
 
     // aux minimization variables
-    double S;
+    double NLL;
     std::vector<double> gradient;
-    double aux_S_plus;
-    double aux_S_minus;
+    double aux_NLL_plus;
+    double aux_NLL_minus;
     VariableParameters aux_vparams;
     std::vector<double> aux_vparams_vector;
     TH1D aux_simHist;
 
     // minimization parameters
     int iterations;
-    double stepPerc;
+    double derivStepPerc;
     int currentStep;
+    int gradientIters = 1;
 
     // --- Adam optimizer state ---
     std::vector<double> m;  // First moment vector
@@ -137,5 +161,9 @@ private:
     double beta1 = 0.7;         // standard is 0.9, but lower is better for noisier gradients
     double beta2 = 0.999;
     double epsilon = 1e-8;
-    double minimUpdatePerc;
+    double startingLearningRate;
+
+    // hist parameters
+    double maxHistVal = 2.75E-12;
+    int histBins = 400;
 };

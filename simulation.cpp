@@ -95,7 +95,7 @@ void Simulation::Simulate()
     simData.push_back(sorted);
     numSimulations += 1;
 
-    simData[simData.size()-1].charges = ChargeOutput(sorted.measurements, vparams);
+    simData[simData.size()-1].charges = ChargeOutput(sorted.measurements, fparams, vparams);
 
     // Time after simulation execution
     //auto stop = std::chrono::high_resolution_clock::now();

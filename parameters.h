@@ -8,16 +8,19 @@ struct FixedParameters{
     ************************************************/
 
     // Incoming photon rate [1/s]
-    double photonRate                                       = 0 * 1E3;
+    double photonRate                                       = 0;
 
     // Integration time/measurement window [s]
-    double T                                                = 0.3;
+    double T                                                = 0.5;
 
     // Time bin or time discretization [s]
     double timeBin                                          = 500E-12;
 
     // Timing jitter mean [s]
     double jitterLoc                                        = 0;
+
+    // SiPM pulse rise time [s]
+    double riseTime                                         = 20E-9;
 
     // Analog front end amplification gain [C]
     // this is the amplification gain of measurements. AFE = TIA + Voltage amplifier
@@ -43,7 +46,7 @@ struct VariableParameters{
     double pde                                              = 0.272;
 
     // Probability of short afterpulsing
-    double pAPSHORT                                         = 0.02;
+    double pAPSHORT                                         = 0.15;     // this is for testing only. Real value is close to 0
 
     // Time constant of short afterpulsing [s]
     double tAPSHORT                                         = 10E-9;
@@ -63,8 +66,8 @@ struct VariableParameters{
     // Timing jitter standard deviation [s]
     double jitter                                           = 565E-12 / 2.355;
 
-    // Pulse width of microcell detection [s]
-    double pulseWidth                                       = 50E-9;        // unused as of this version. Planned for future use
+    // Pulse duration [s]
+    double pulseWidth                                       = 40E-9;
 
     // Microcell recharge time [s]
     double rechargeTime                                     = 82E-9;
@@ -73,7 +76,7 @@ struct VariableParameters{
     double gain                                             = 5E6;
 
     // Microcell standard deviation
-    double gainStd                                          = 3.5E5;
+    double gainStd                                          = 2E5;
         
     // charge integration gate
     double gate                                             = 70E-9;

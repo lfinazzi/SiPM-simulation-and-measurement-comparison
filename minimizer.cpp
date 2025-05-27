@@ -4,8 +4,8 @@
 #endif
 
 
-Minimizer::Minimizer(FixedParameters _fparameters, VariableParameters _vparameters, RealData _data, int _iterations, double _stepPerc, double _mup)
-    : sim(_fparameters, _vparameters), data(_data), fparams(_fparameters), vparams(_vparameters), iterations(_iterations), stepPerc(_stepPerc), minimUpdatePerc(_mup)
+Minimizer::Minimizer(FixedParameters _fparameters, VariableParameters _vparameters, RealData _data, int _iterations, double _derivStepPerc, double _slr)
+    : sim(_fparameters, _vparameters), data(_data), fparams(_fparameters), vparams(_vparameters), iterations(_iterations), derivStepPerc(_derivStepPerc), startingLearningRate(_slr)
 {
     sim.Simulate();
     vparams_vector = ParameterToVector(vparams);
@@ -13,8 +13,8 @@ Minimizer::Minimizer(FixedParameters _fparameters, VariableParameters _vparamete
     dataHist.SetTitle("charge histogram data");
     simHist.SetTitle("charge histogram sim");
 
-    dataHist.SetBins(300, 0, 1E-11);
-    simHist.SetBins(300, 0, 1E-11);
+    dataHist.SetBins(histBins, 0, maxHistVal);
+    simHist.SetBins(histBins, 0, maxHistVal);
 
     currentStep = 0;
 
@@ -24,6 +24,7 @@ Minimizer::Minimizer(FixedParameters _fparameters, VariableParameters _vparamete
     for(size_t i = 0; i < chargesData.size(); i++) {
         dataHist.Fill(chargesData[i]);
     }
+    dataHist.Scale(1.0/dataHist.GetEntries());      // treats data histogram as the real probability distribution
 
 
     for(size_t i = 0; i < chargesSim.size(); i++) {
@@ -33,7 +34,7 @@ Minimizer::Minimizer(FixedParameters _fparameters, VariableParameters _vparamete
     simHist.SetLineColor(kRed);
     
     currentStep++;
-    CalculateS();
+    CalculateNLL();
 
     aux_vparams = vparams;
     aux_vparams_vector = ParameterToVector(aux_vparams);
@@ -41,65 +42,67 @@ Minimizer::Minimizer(FixedParameters _fparameters, VariableParameters _vparamete
     aux_simHist.SetTitle("aux charge histogram data");
     aux_simHist.SetTitle("aux charge histogram sim");
 
-    aux_simHist.SetBins(300, 0, 1E-11);
+    aux_simHist.SetBins(histBins, 0, maxHistVal);
 
     gradient.resize(vparams_vector.size(), 0);
 
 }  
 
-void Minimizer::CalculateS()
+void Minimizer::CalculateNLL()
 {
-    double s = 0;
+    double nll = 0;
     double simBinContent = 0;
     double dataBinContent = 0;
     for(int i = 1; i <= dataHist.GetNbinsX(); i++)
     {
         dataBinContent = dataHist.GetBinContent(i);
         simBinContent = simHist.GetBinContent(i);
-        s += (dataBinContent - simBinContent)*(dataBinContent - simBinContent);
+        //nll -= dataBinContent * log(simBinContent + 1E-8) - simBinContent * ( log(simBinContent + 1E-8) - 1 ); 
+        nll -= dataBinContent * log(simBinContent + 1E-8);
     }
 
-    S = s;      // stores the current S value to class member  
+    NLL = nll;      // stores the current NLL value to class member  
        
 }
 
-void Minimizer::CalculateSExternal(TH1D hist, std::string option)
+void Minimizer::CalculateNLLExternal(TH1D hist, std::string option)
 {
-    double s = 0;
+    double nll = 0;
     double simBinContent = 0;
     double dataBinContent = 0;
     for(int i = 1; i <= hist.GetNbinsX(); i++)
     {
         dataBinContent = dataHist.GetBinContent(i);
-        simBinContent = hist.GetBinContent(i);
-        s += (dataBinContent - simBinContent)*(dataBinContent - simBinContent);
+        simBinContent = hist.GetBinContent(i);        
+        //nll -= dataBinContent * log(simBinContent + 1E-8) - simBinContent * ( log(simBinContent + 1E-8) - 1 ); 
+        nll -= dataBinContent * log(simBinContent + 1E-8);
     }
 
     if(option == "plus")
-        aux_S_plus = s;  // stores the current S value to aux_S_plus
+        aux_NLL_plus = nll;  // stores the current NLL value to aux_NLL_plus
     else if(option == "minus")
-        aux_S_minus = s; // stores the current S value to aux_S_minus
+        aux_NLL_minus = nll; // stores the current NLL value to aux_NLL_minus
     else
-        std::cout << "Invalid option for CalculateSExternal" << std::endl;
+        std::cout << "Invalid option for CalculateNLLExternal" << std::endl;
 }
 
 void Minimizer::CalculateDerivative(int numParam)
 {
-    double deltaStep = vparams_vector[numParam] * stepPerc;
+    double deltaStep = vparams_vector[numParam] * derivStepPerc;
     aux_vparams_vector[numParam] += deltaStep;
     UpdateParameters(aux_vparams_vector, aux_vparams);
 
     Simulation aux_sim_plus(fparams, aux_vparams);
     aux_sim_plus.Simulate();
 
-    TH1D aux_simHist("aux_simHist", "aux_simHist", 300, 0, 1E-11); 
+    TH1D aux_simHist("aux_simHist", "aux_simHist", histBins, 0, maxHistVal); 
     std::vector<double> chargesSim = aux_sim_plus.SimDataCharge(0);
 
     for(size_t i = 0; i < chargesSim.size(); i++) {
         aux_simHist.Fill(chargesSim[i]);
     }    
 
-    CalculateSExternal(aux_simHist, "plus");
+    CalculateNLLExternal(aux_simHist, "plus");
 
     aux_vparams_vector[numParam] -= 2 * deltaStep;
     UpdateParameters(aux_vparams_vector, aux_vparams);
@@ -107,15 +110,14 @@ void Minimizer::CalculateDerivative(int numParam)
     Simulation aux_sim_minus(fparams, aux_vparams);
     aux_sim_minus.Simulate();
 
-    TH1D aux_simHist_m("aux_simHist_m", "aux_simHist_m", 300, 0, 1E-11); 
+    TH1D aux_simHist_m("aux_simHist_m", "aux_simHist_m", histBins, 0, maxHistVal); 
     std::vector<double> chargesSim_m = aux_sim_minus.SimDataCharge(0);
 
     for(size_t i = 0; i < chargesSim_m.size(); i++) {
         aux_simHist_m.Fill(chargesSim_m[i]);
     }    
 
-    CalculateSExternal(aux_simHist_m, "minus");
-
+    CalculateNLLExternal(aux_simHist_m, "minus");
 
     // reset aux_vparams to the original value
     aux_vparams_vector[numParam] += deltaStep;
@@ -128,10 +130,15 @@ void Minimizer::CalculateGradient()
 {
     for(size_t i = 0; i < vparams_vector.size(); i++)
     {
-        CalculateDerivative(i);
-        gradient[i] = (aux_S_plus - aux_S_minus) / (2 * vparams_vector[i] * stepPerc);
-        //std::cout << "Gradient component: " << gradient[i] << std::endl;
+        std::vector<double> gradMeans;
+        for(int j = 0; j < gradientIters; j++)
+        {
+            CalculateDerivative(i);
+            gradMeans.push_back( (aux_NLL_plus - aux_NLL_minus) / (2 * vparams_vector[i] * derivStepPerc) );
+        }
+        gradient[i] = Mean(gradMeans); // calculate the mean of the gradient values
     }
+    
 }
 
 void Minimizer::Update()
@@ -144,8 +151,10 @@ void Minimizer::Update()
     }
 
     // learning rate decays with each iteration
-    double currentUpdatePerc = minimUpdatePerc / (1.0 + 1E-4 * t);
+    double lr = startingLearningRate;// / (1.0 + 1E-4 * t);
     t += 1;
+
+    NormalizeParameters(); // normalize parameters for minimization
 
     // --- Adam parameter update ---
     for (size_t i = 0; i < vparams_vector.size(); ++i)
@@ -162,10 +171,13 @@ void Minimizer::Update()
 
 
         // Parameter update
-        vparams_vector[i] -= currentUpdatePerc * abs(vparams_vector[i]) * m_hat / (std::sqrt(v_hat) + epsilon);
+        vparams_vector[i] -= lr * m_hat / (std::sqrt(v_hat) + epsilon);
     }
+
+    DenormalizeParameters(); // denormalize parameters for simulation
     
     UpdateParameters(vparams_vector, vparams);
+
     
     // update simulation
     sim.SetVParameters(vparams);
@@ -179,7 +191,7 @@ void Minimizer::Update()
         simHist.Fill(chargesSim[i]);
     }
 
-    CalculateS();
+    CalculateNLL();
 
     aux_vparams = vparams;
     aux_vparams_vector = ParameterToVector(aux_vparams);
@@ -192,28 +204,76 @@ void Minimizer::RunMinimizer()
     auto start = std::chrono::high_resolution_clock::now();
     std::cout << "\n----------------------------------------" << std::endl;
     std::cout << "----------------------------------------" << std::endl;
-    double prevS = 0;
+    double prevNLL = 0;
+    double gradNorm = 0;
     std::vector<double> prevParams;
-    for(int i = 0; i < iterations; i++)
+    std::vector<double> nllVals;
+    int i = 0;
+    for(i = 0; i < iterations; i++)
     {
         std::cout << "Iteration: " << i + 1 << std::endl;
         CalculateGradient();
-        prevS = S;
-        svector.push_back(S);   // stores S for later visualization
+        prevNLL = NLL;
+        svector.push_back(NLL);   // stores NLL for later visualization
         prevParams = vparams_vector; // store previous parameters
-        std::cout << "Previous S: " << prevS << std::endl;
+        std::cout << "Previous NLL: " << prevNLL << std::endl;
         PrintVector(prevParams, "Previous parameters: ");
         std::cout << "----------------------------------------" << std::endl;
-        PrintVector(gradient, "Gradient: ");
+        //PrintVector(gradient, "Gradient: ");
+        
+        gradNorm = 0;
+        for (double g : gradient) gradNorm += g * g;
+        gradNorm = std::sqrt(gradNorm);
+        std::cout << "||Gradient|| : " << gradNorm << std::endl;
         std::cout << "----------------------------------------" << std::endl;
+        
         Update();
-        schangevector.push_back(S - prevS);   // stores S for later visualization
-        std::cout << "current S: " << S << std::endl;
+        schangevector.push_back(NLL - prevNLL);   // stores NLL for later visualization
+        std::cout << "current NLL: " << NLL << std::endl;
         PrintVector(vparams_vector, "Current parameters: ");
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "----------------------------------------\n" << std::endl;
-    }
-    auto stop = std::chrono::high_resolution_clock::now();
-    std::cout << iterations << " iterations completed.\nMinimization completed in " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()/1000 << " seconds.\n";
 
+        if(i > 5){
+            for(int j = 0; j < 5; j++){
+                if(svector[i - j] > svector[i - j - 1]){
+                    std::cout << "NLL is increasing, stopping minimization." << std::endl;
+                    goto end;
+                }
+            }
+        }
+    }
+    end:
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    std::cout << i + 1 << " iterations completed.\nMinimization completed in " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()/1000 << " seconds.\n";
+
+}
+
+void Minimizer::NormalizeParameters()
+{
+    vparams_vector[0] /= 1E6;       // DCR    
+    vparams_vector[3] /= 100E-9;    // tAPSHORT
+    vparams_vector[5] /= 1E-6;      // tAPLONG
+    vparams_vector[7] /= 10E-9;     // tCT
+    vparams_vector[8] /= 1E-9;      // jitter
+    vparams_vector[9] /= 100E-9;    // pulseWidth
+    vparams_vector[10] /= 100E-9;   // rechargeTime
+    vparams_vector[11] /= 1E7;      // gain
+    vparams_vector[12] /= 1E6;      // gainStd
+    vparams_vector[13] /= 100E-9;   // gate
+}
+
+void Minimizer::DenormalizeParameters()
+{
+    vparams_vector[0] *= 1E6;       // DCR    
+    vparams_vector[3] *= 100E-9;    // tAPSHORT
+    vparams_vector[5] *= 1E-6;      // tAPLONG
+    vparams_vector[7] *= 10E-9;     // tCT
+    vparams_vector[8] *= 1E-9;      // jitter
+    vparams_vector[9] *= 100E-9;    // pulseWidth
+    vparams_vector[10] *= 100E-9;   // rechargeTime
+    vparams_vector[11] *= 1E7;      // gain
+    vparams_vector[12] *= 1E6;      // gainStd
+    vparams_vector[13] *= 100E-9;   // gate
 }

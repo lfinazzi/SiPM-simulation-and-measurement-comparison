@@ -206,7 +206,7 @@ std::vector<double> RemoveSaturatedCounts(Parameters params, std::vector<double>
 }
 */
 
-std::vector<double> ChargeOutput(std::vector<Measurement> input, VariableParameters vparams)
+std::vector<double> ChargeOutput(std::vector<Measurement> input, FixedParameters fparams, VariableParameters vparams)
 {
     std::vector<double> charge;
     std::vector<double> trigger;
@@ -232,7 +232,11 @@ std::vector<double> ChargeOutput(std::vector<Measurement> input, VariableParamet
         int j = 1;
         while(trigger[pointer + j] - trigger[pointer] < vparams.gate)
         {
-            q += charge[pointer + j];
+            if(abs(vparams.gate - trigger[pointer + j]) < 5 * vparams.pulseWidth)   // exponential decay
+                // this is to account by charge loss due to gate duration
+                q += charge[pointer + j] * SiPMPulseIntegral(vparams.gate, trigger[pointer + j], fparams.riseTime, vparams.pulseWidth);
+            else
+                q += charge[pointer + j];
             j += 1;
         }
         pointer += j;
@@ -306,11 +310,25 @@ void RandomizeParameters(VariableParameters &vparams, double scale)
     vparams.jitter += gRandom->Gaus(0, vparams.jitter * scale);
     vparams.pulseWidth += gRandom->Gaus(0, vparams.pulseWidth * scale);
     vparams.rechargeTime += gRandom->Gaus(0, vparams.rechargeTime * scale);
-    vparams.gain += gRandom->Gaus(0, vparams.gain * scale);
-    vparams.gainStd += gRandom->Gaus(0, vparams.gainStd * scale);
+    //vparams.gain += gRandom->Gaus(0, vparams.gain * scale);
+    //vparams.gainStd += gRandom->Gaus(0, vparams.gainStd * scale);
     vparams.gate += gRandom->Gaus(0, vparams.gate * scale);
 
     return;
 }
 
+// Pulse normalized to have area = 1
+double SiPMPulseNormalized(double t, double t0, double tau_rise, double tau_fall) {
+    if (t < t0) return 0.0;
+    double dt = t - t0;
+    double norm = 1.0 / (tau_fall - tau_rise);
+    return norm * (std::exp(-dt / tau_fall) - std::exp(-dt / tau_rise));
+}
 
+// Cumulative integral of the normalized pulse from t0 to t
+double SiPMPulseIntegral(double t, double t0, double tau_rise, double tau_fall) {
+    if (t < t0) return 0.0;
+    double dt = t - t0;
+    double norm = 1.0 / (tau_fall - tau_rise);
+    return norm * (tau_fall * (1.0 - std::exp(-dt / tau_fall)) - tau_rise * (1.0 - std::exp(-dt / tau_rise)));
+}
