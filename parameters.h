@@ -22,6 +22,9 @@ struct FixedParameters{
     // SiPM pulse rise time [s]
     double riseTime                                         = 20E-9;
 
+    // Integration gate [s]
+    double gate                                             = 70E-9;
+
     // Analog front end amplification gain [C]
     // this is the amplification gain of measurements. AFE = TIA + Voltage amplifier
     // Number between (...) was simulated with pyhton script -> TODO: Measure it
@@ -40,7 +43,7 @@ struct VariableParameters{
     ************************************************/
 
     // Dark count rate [1/s]
-    double DCR                                              = 1.11E5;
+    double DCR                                              = 1.5E5; // 1.11E5;
 
     // Photon detection efficiency
     double pde                                              = 0.272;
@@ -77,8 +80,5 @@ struct VariableParameters{
 
     // Microcell standard deviation
     double gainStd                                          = 2E5;
-        
-    // charge integration gate
-    double gate                                             = 70E-9;
 
 };

@@ -46,6 +46,9 @@ Minimizer::Minimizer(FixedParameters _fparameters, VariableParameters _vparamete
 
     gradient.resize(vparams_vector.size(), 0);
 
+    // this leaves DCR fixed in minimization (TODO: Add variable to FixedParameters)
+    //vparams_update[0] = false; // DCR, currently minimized
+
 }  
 
 void Minimizer::CalculateNLL()
@@ -171,6 +174,10 @@ void Minimizer::Update()
 
 
         // Parameter update
+        if(vparams_update[i] == false)
+            lr = 0;
+        else
+            lr = startingLearningRate;  // (1.0 + 1E-4 * t); // learning rate decays with each iteration
         vparams_vector[i] -= lr * m_hat / (std::sqrt(v_hat) + epsilon);
     }
 
@@ -249,7 +256,11 @@ void Minimizer::RunMinimizer()
 
     end:
     auto stop = std::chrono::high_resolution_clock::now();
-    std::cout << i + 1 << " iterations completed.\nMinimization completed in " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()/1000 << " seconds.\n";
+    std::cout << i << " iterations completed.\nMinimization completed in " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()/1000 << " seconds.\n";
+
+    // prints final parameters to console
+    std::cout << std::endl;
+    PrintParameters();
 
 }
 
@@ -264,7 +275,6 @@ void Minimizer::NormalizeParameters()
     vparams_vector[10] /= 100E-9;   // rechargeTime
     vparams_vector[11] /= 1E7;      // gain
     vparams_vector[12] /= 1E6;      // gainStd
-    vparams_vector[13] /= 100E-9;   // gate
 }
 
 void Minimizer::DenormalizeParameters()
@@ -278,5 +288,22 @@ void Minimizer::DenormalizeParameters()
     vparams_vector[10] *= 100E-9;   // rechargeTime
     vparams_vector[11] *= 1E7;      // gain
     vparams_vector[12] *= 1E6;      // gainStd
-    vparams_vector[13] *= 100E-9;   // gate
+}
+
+void Minimizer::PrintParameters()
+{
+    std::cout << "Parameters: " << std::endl;
+    std::cout << "DCR: " << vparams_vector[0] / 1E6 << " [MHz]" << std::endl;
+    std::cout << "pde: " << vparams_vector[1] << std::endl;
+    std::cout << "pAPSHORT: " << vparams_vector[2] << std::endl;
+    std::cout << "tAPSHORT: " << vparams_vector[3] / 1E-9 << " [ns]" << std::endl;
+    std::cout << "pAPLONG: " << vparams_vector[4] << std::endl;
+    std::cout << "tAPLONG: " << vparams_vector[5] / 1E-9 << " [ns]" << std::endl;
+    std::cout << "pCT: " << vparams_vector[6] << std::endl;
+    std::cout << "tCT: " << vparams_vector[7] / 1E-9 << " [ns]" << std::endl;
+    std::cout << "jitter: " << vparams_vector[8] / 1E-9 << " [ns]" << std::endl;
+    std::cout << "pulseWidth: " << vparams_vector[9] / 1E-9 << " [ns]" << std::endl;
+    std::cout << "rechargeTime: " << vparams_vector[10] / 1E-9 << " [ns]" << std::endl;
+    std::cout << "gain: " << vparams_vector[11] << std::endl;
+    std::cout << "gainStd: " << vparams_vector[12] << std::endl;
 }

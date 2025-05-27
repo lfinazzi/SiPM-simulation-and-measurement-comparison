@@ -15,6 +15,6 @@ The code can plot the finger spectrum (using charge values) of the data and simu
 # TODO
   1. Try other minimization scalars (currently using Negative Log Likelihood, but it's erratic),
   2. Refine minimization procedure and take care of noisy gradients,
-  3. Implement a way to leave some of the VariableParameters fixed for debug purposes and avoid overfitting,
-  4. Implement a temporal signal/waveform generation pipeline (can be constructed with a pulse template of desired SiPM).
+  3. Implement a temporal signal/waveform generation pipeline (can be constructed with a pulse template of desired SiPM),
+  4. Figure out what causes shoulders in finger spectrum. Simulation seems to indicate that it's caused by afterpulsing, but I'm not sure.
 

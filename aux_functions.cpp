@@ -230,11 +230,11 @@ std::vector<double> ChargeOutput(std::vector<Measurement> input, FixedParameters
 
         q = charge[pointer];
         int j = 1;
-        while(trigger[pointer + j] - trigger[pointer] < vparams.gate)
+        while(trigger[pointer + j] - trigger[pointer] < fparams.gate)
         {
-            if(abs(vparams.gate - trigger[pointer + j]) < 5 * vparams.pulseWidth)   // exponential decay
+            if(abs(fparams.gate - trigger[pointer + j]) < 5 * vparams.pulseWidth)   // exponential decay
                 // this is to account by charge loss due to gate duration
-                q += charge[pointer + j] * SiPMPulseIntegral(vparams.gate, trigger[pointer + j], fparams.riseTime, vparams.pulseWidth);
+                q += charge[pointer + j] * SiPMPulseIntegral(fparams.gate, trigger[pointer + j], fparams.riseTime, vparams.pulseWidth);
             else
                 q += charge[pointer + j];
             j += 1;
@@ -262,7 +262,6 @@ std::vector<double> ParameterToVector(VariableParameters &vparams)
     output.push_back(vparams.rechargeTime);
     output.push_back(vparams.gain);
     output.push_back(vparams.gainStd);
-    output.push_back(vparams.gate);
     return output;
 }
 
@@ -281,7 +280,6 @@ void UpdateParameters(std::vector<double> &vparams_vector, VariableParameters &v
     vparams.rechargeTime = vparams_vector[10];
     vparams.gain = vparams_vector[11];
     vparams.gainStd = vparams_vector[12];
-    vparams.gate = vparams_vector[13];
 
     return;
 }
@@ -299,6 +297,7 @@ void PrintVector(std::vector<double> &vparams_vector, std::string legend)
 
 void RandomizeParameters(VariableParameters &vparams, double scale)
 {
+
     vparams.DCR += gRandom->Gaus(0, vparams.DCR * scale);
     vparams.pde += gRandom->Gaus(0, vparams.pde * scale);
     vparams.pAPSHORT += gRandom->Gaus(0, vparams.pAPSHORT * scale);
@@ -312,7 +311,6 @@ void RandomizeParameters(VariableParameters &vparams, double scale)
     vparams.rechargeTime += gRandom->Gaus(0, vparams.rechargeTime * scale);
     //vparams.gain += gRandom->Gaus(0, vparams.gain * scale);
     //vparams.gainStd += gRandom->Gaus(0, vparams.gainStd * scale);
-    vparams.gate += gRandom->Gaus(0, vparams.gate * scale);
 
     return;
 }

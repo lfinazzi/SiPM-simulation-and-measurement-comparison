@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
     FixedParameters fparams;
 
     VariableParameters vparams;
-    double randomScale = 0; // scale for randomization of parameters (to test Minimizer with slightly incorrect parameters)
+    double randomScale = 0.2; // scale for randomization of parameters (to test Minimizer with slightly incorrect parameters)
     RandomizeParameters(vparams, randomScale);
 
     // Adjust data to compensate for AFE gain at acquisition (this allows simulation comparison)

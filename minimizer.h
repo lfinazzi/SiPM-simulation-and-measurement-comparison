@@ -106,6 +106,15 @@ public:
      *      None
      ****************************************************************************/
     void DenormalizeParameters();
+
+    /****************************************************************************
+     * Prints variable parameters to console
+     * Arguments:
+     *      None
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void PrintParameters();
     
     // returns data member
     inline RealData GetData() { return data; }
@@ -134,6 +143,9 @@ private:
     FixedParameters fparams;
     VariableParameters vparams;
     std::vector<double> vparams_vector;
+
+    std::vector<bool> vparams_update = {true, true, true, true, true, true, true, true, true, true, true, true, true};
+
     std::vector<double> svector;
     std::vector<double> schangevector;
 
