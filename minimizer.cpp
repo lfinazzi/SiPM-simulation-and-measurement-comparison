@@ -234,17 +234,20 @@ void Minimizer::RunMinimizer()
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "----------------------------------------\n" << std::endl;
 
-        if(i > 5){
+        bool cancelRun = true;
+        if(i >= 5){
             for(int j = 0; j < 5; j++){
-                if(svector[i - j] > svector[i - j - 1]){
-                    std::cout << "NLL is increasing, stopping minimization." << std::endl;
-                    goto end;
-                }
+                cancelRun &= (svector[i - j] > svector[i - j - 1]);
+                
+            }
+            if (cancelRun){
+                std::cout << "NLL is increasing, stopping minimization." << std::endl;
+                goto end;
             }
         }
     }
-    end:
 
+    end:
     auto stop = std::chrono::high_resolution_clock::now();
     std::cout << i + 1 << " iterations completed.\nMinimization completed in " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()/1000 << " seconds.\n";
 
