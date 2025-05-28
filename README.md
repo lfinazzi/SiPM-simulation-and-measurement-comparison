@@ -13,8 +13,8 @@ The simulation part of the code generates SiPM primary, crosstalk and afterpulsi
 The code can plot the finger spectrum (using charge values) of the data and simulation in the same plot for direct comparison.
 
 # TODO
-  1. Try other minimization scalars (currently using Negative Log Likelihood, but it's erratic),
-  2. Refine minimization procedure and take care of noisy gradients,
+  1. Try other minimization scalars -> Currently, NLL was miscalculated. Fix this for improved minimization. The code was using p*log(k) instead of k*log(p) in NLL, 
+  2. Implement a second minimization using the timing histogram to fine tune timing parameters. First, minimization of certain parameters will be performed using the finger spectrum (with timing parameters fixed). Then, the timing histogram will be used to fine tune timing parameters, maintaining all other parameters fixed.
   3. Implement a temporal signal/waveform generation pipeline (can be constructed with a pulse template of desired SiPM),
   4. Figure out what causes shoulders in finger spectrum. Simulation seems to indicate that it's caused by afterpulsing, but I'm not sure.
 
