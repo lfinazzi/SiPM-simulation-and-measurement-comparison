@@ -296,3 +296,15 @@ double SiPMPulseNormalized(double t, double t0, double tau_rise, double tau_fall
  *      double : integral value at time t
  ****************************************************************************/
 double SiPMPulseIntegral(double t, double t0, double tau_rise, double tau_fall);
+
+
+/****************************************************************************
+ * Calculates timing outputs in a time gate from Measurement input vector
+ * Arguments:
+ *      std::vector<Measurement> : input measurements
+ *      FixedParameters : simulation parameters
+ *      FixedParameters : simulation parameters
+ * Returns:
+ *      std::vector<double>
+ ****************************************************************************/
+std::vector<double> TimingOutput(std::vector<Measurement> input, FixedParameters fparams);

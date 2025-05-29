@@ -39,6 +39,7 @@ struct SimulationOutput
 {
     std::vector<Measurement> measurements;
     std::vector<double> charges;
+    std::vector<double> triggers;
 };
 
 
@@ -87,6 +88,11 @@ public:
      * Returns measurements of simulation number n
      ****************************************************************************/
     inline std::vector<double> SimDataCharge(int n) { return simData[n].charges; }
+
+    /****************************************************************************
+     * Returns measurements of simulation number n
+     ****************************************************************************/
+    inline std::vector<double> SimDataTiming(int n) { return simData[n].triggers; }
 
     /****************************************************************************
      * set VariableParameters member

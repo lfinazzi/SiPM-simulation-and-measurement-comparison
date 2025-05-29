@@ -309,8 +309,8 @@ void RandomizeParameters(VariableParameters &vparams, double scale)
     vparams.jitter += gRandom->Gaus(0, vparams.jitter * scale);
     vparams.pulseWidth += gRandom->Gaus(0, vparams.pulseWidth * scale);
     vparams.rechargeTime += gRandom->Gaus(0, vparams.rechargeTime * scale);
-    //vparams.gain += gRandom->Gaus(0, vparams.gain * scale);
-    //vparams.gainStd += gRandom->Gaus(0, vparams.gainStd * scale);
+    vparams.gain += gRandom->Gaus(0, vparams.gain * scale);
+    vparams.gainStd += gRandom->Gaus(0, vparams.gainStd * scale);
 
     return;
 }
@@ -329,4 +329,25 @@ double SiPMPulseIntegral(double t, double t0, double tau_rise, double tau_fall) 
     double dt = t - t0;
     double norm = 1.0 / (tau_fall - tau_rise);
     return norm * (tau_fall * (1.0 - std::exp(-dt / tau_fall)) - tau_rise * (1.0 - std::exp(-dt / tau_rise)));
+}
+
+std::vector<double> TimingOutput(std::vector<Measurement> input, FixedParameters fparams)
+{
+    std::vector<double> trigger;
+    for(uint i = 0; i < input.size(); i++){
+        trigger.push_back(input[i].time);
+    }
+
+    std::vector<double> temp = Diffs(trigger); // calculate time differences
+    std::vector<double> output;
+
+    for(uint i = 0; i < temp.size(); i++)
+    {
+        if(temp[i] > fparams.gate){
+            output.push_back(temp[i]);
+        }
+
+    }
+
+    return output;
 }

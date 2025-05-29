@@ -41,6 +41,16 @@ public:
 
     /****************************************************************************
      * Calculates the negative log likelihood of measuring the sim data
+     * given the measurement data (which is treated as the real distribution).
+     * Arguments:
+     *      None
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void CalculateNLLTiming();
+
+    /****************************************************************************
+     * Calculates the negative log likelihood of measuring the sim data
      * given the measurement data (which is treated as the real distribution)
      * using an external histogram.
      * Arguments:
@@ -52,6 +62,18 @@ public:
     void CalculateNLLExternal(TH1D hist, std::string option);
 
     /****************************************************************************
+     * Calculates the negative log likelihood of measuring the sim data
+     * given the measurement data (which is treated as the real distribution)
+     * using an external histogram.
+     * Arguments:
+     *      TH1D : external histogram
+     *      std::string : option to use: plus or minus
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void CalculateNLLExternalTiming(TH1D hist, std::string option);
+
+    /****************************************************************************
      * Calculates the derivative  of S with respect to a variable parameters
      * Arguments:
      *      int : parameter index
@@ -59,6 +81,15 @@ public:
      *      None
      ****************************************************************************/
     void CalculateDerivative(int numParam);
+
+    /****************************************************************************
+     * Calculates the derivative  of S with respect to a variable parameters
+     * Arguments:
+     *      int : parameter index
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void CalculateDerivativeTiming(int numParam);
 
     /****************************************************************************
      * Calculates the gradient of S with respect to the variable parameters
@@ -71,6 +102,16 @@ public:
     void CalculateGradient();
 
     /****************************************************************************
+     * Calculates the gradient of S with respect to the variable parameters
+     * uses gradientIters iterations to average the gradient
+     * Arguments:
+     *      None
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void CalculateGradientTiming();
+
+    /****************************************************************************
      * Updates the variable parameters and the simulation with the new parameters
      * Arguments:
      *      None
@@ -78,6 +119,15 @@ public:
      *      None
      ****************************************************************************/
     void Update();
+
+    /****************************************************************************
+     * Updates the variable parameters and the simulation with the new parameters
+     * Arguments:
+     *      None
+     * Returns:
+     *      None
+     ****************************************************************************/
+    void UpdateTiming();
 
     /****************************************************************************
      * Runs minimizer for a number of iterations
@@ -122,11 +172,17 @@ public:
     // returns current simulation member
     inline Simulation GetSim() { return sim; }
 
-    // returns data histogra
+    // returns data histogram
     inline TH1D* GetDataHist() { return &dataHist; }
 
     // returns simulation histogram
     inline TH1D* GetSimHist() { return &simHist; }
+
+    // returns data histogram (timing)
+    inline TH1D* GetDataHistTiming() { return &dataHistTiming; }
+
+    // returns simulation histogram (timing)
+    inline TH1D* GetSimHistTiming() { return &simHistTiming; }
 
     // returns S value for each iteration
     inline std::vector<double> GetSVector() { return svector; }
@@ -134,12 +190,20 @@ public:
     // returns S value change for each iteration
     inline std::vector<double> GetSChangeVector() { return schangevector; }
 
+    // returns S value for each iteration (timing)
+    inline std::vector<double> GetSVectorTiming() { return svectorTiming; }
+
+    // returns S value change for each iteration (timing)
+    inline std::vector<double> GetSChangeVectorTiming() { return schangevectorTiming; }
+
 
 private:
     Simulation sim;
     RealData data;
     TH1D simHist;
     TH1D dataHist;
+    TH1D simHistTiming;
+    TH1D dataHistTiming;
     FixedParameters fparams;
     VariableParameters vparams;
     std::vector<double> vparams_vector;
@@ -148,15 +212,21 @@ private:
 
     std::vector<double> svector;
     std::vector<double> schangevector;
+    std::vector<double> svectorTiming;
+    std::vector<double> schangevectorTiming;
 
     // aux minimization variables
     double NLL;
+    double NLLTiming;
     std::vector<double> gradient;
     double aux_NLL_plus;
     double aux_NLL_minus;
+    double aux_NLL_plusTiming;
+    double aux_NLL_minusTiming;
     VariableParameters aux_vparams;
     std::vector<double> aux_vparams_vector;
     TH1D aux_simHist;
+    TH1D aux_simHistTiming;
 
     // minimization parameters
     int iterations;
@@ -172,10 +242,14 @@ private:
     // Adam hyperparameters
     double beta1 = 0.7;         // standard is 0.9, but lower is better for noisier gradients
     double beta2 = 0.999;
-    double epsilon = 1e-8;
+    double epsilon = 1E-8;
     double startingLearningRate;
 
     // hist parameters
     double maxHistVal = 2.75E-12;
     int histBins = 400;
+
+    int minHistValTimingLog;
+    int maxHistValTimingLog = log10(1E-5);
+    int histBinsTiming = 300;
 };

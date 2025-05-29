@@ -38,6 +38,14 @@ public:
      ****************************************************************************/
     inline std::vector<double> GetChargeData() { return chargeValues; }
 
+    /****************************************************************************
+     * Returns timingValues member
+     * Arguments:
+     *      None
+     * Returns:
+     *      std::vector<double> : timing values
+     ****************************************************************************/
+    inline std::vector<double> GetTimingData() { return timingValues; }
 
     /****************************************************************************
      * Adjusts real measurements to compensate for AFE gain
@@ -50,6 +58,7 @@ public:
 
 private:
     std::vector<double> chargeValues;
+    std::vector<double> timingValues;
 
 };
 

@@ -11,7 +11,7 @@ struct FixedParameters{
     double photonRate                                       = 0;
 
     // Integration time/measurement window [s]
-    double T                                                = 0.5;
+    double T                                                = 0.3;
 
     // Time bin or time discretization [s]
     double timeBin                                          = 500E-12;
@@ -23,7 +23,7 @@ struct FixedParameters{
     double riseTime                                         = 20E-9;
 
     // Integration gate [s]
-    double gate                                             = 70E-9;
+    double gate                                             = 200E-9;
 
     // Analog front end amplification gain [C]
     // this is the amplification gain of measurements. AFE = TIA + Voltage amplifier
@@ -43,13 +43,13 @@ struct VariableParameters{
     ************************************************/
 
     // Dark count rate [1/s]
-    double DCR                                              = 1.5E5; // 1.11E5;
+    double DCR                                              = 2E5;
 
     // Photon detection efficiency
     double pde                                              = 0.272;
 
     // Probability of short afterpulsing
-    double pAPSHORT                                         = 0.15;     // this is for testing only. Real value is close to 0
+    double pAPSHORT                                         = 0.15;
 
     // Time constant of short afterpulsing [s]
     double tAPSHORT                                         = 10E-9;

@@ -3,6 +3,11 @@
     #include "realdata.h"
 #endif
 
+#ifndef AUX_FUNCTIONS_H
+    #define AUX_FUNCTIONS_H
+    #include "aux_functions.h"
+#endif
+
 RealData::RealData(std::string pathToFile, int eventsToLoad)
 {
     LoadData(pathToFile, eventsToLoad);
@@ -31,8 +36,11 @@ void RealData::LoadData(std::string pathToFile, int eventsToLoad)
 
     int iter0 = 1;
     uint16_t int16_temp;
+    uint16_t int16_temp2;
     uint32_t int32_temp;
     bool ret = false;
+
+    std::vector<double> timestamps;
 
     while(iter0 < events0){
         // ETT
@@ -40,12 +48,19 @@ void RealData::LoadData(std::string pathToFile, int eventsToLoad)
         // TT
         ret = fread(&int32_temp, sizeof(uint32_t), 1, f0);
         // fine TT
-        ret = fread(&int16_temp, sizeof(uint16_t), 1, f0);
+        ret = fread(&int16_temp2, sizeof(uint16_t), 1, f0);
+
+        // TODO: check if this is the correct formula
+        double timetag = (double)(int16_temp << 16 | int32_temp) + (double)int16_temp2 / 1024.0;
+        timestamps.push_back( timetag * 1E-9 ); // convert to seconds
+
         // chage (short gate)
         ret = fread(&int16_temp, sizeof(uint16_t), 1, f0);
         // charge (long gate)
         ret = fread(&int16_temp, sizeof(uint16_t), 1, f0);
+
         chargeValues.push_back((double)int16_temp);
+        
         // baseline
         ret = fread(&int16_temp, sizeof(uint16_t), 1, f0);
         // baseline std    
@@ -53,6 +68,8 @@ void RealData::LoadData(std::string pathToFile, int eventsToLoad)
 
         iter0++;
     }
+
+    timingValues = Diffs(timestamps);
 
     std::cout << "data loading successful (ret code: " << ret << ")\n";
 	return;

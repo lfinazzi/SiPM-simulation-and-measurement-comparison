@@ -96,6 +96,7 @@ void Simulation::Simulate()
     numSimulations += 1;
 
     simData[simData.size()-1].charges = ChargeOutput(sorted.measurements, fparams, vparams);
+    simData[simData.size()-1].triggers = TimingOutput(sorted.measurements, fparams);
 
     // Time after simulation execution
     //auto stop = std::chrono::high_resolution_clock::now();
